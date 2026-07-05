@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube DPDP Privacy - Figma Prototype Simulator</title>
+    
+    <!-- Premium Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        yt: {
+                            red: '#FF0000',
+                            dark: '#202124',
+                            light: '#F8F9FA',
+                            blue: '#4285F4',
+                            green: '#34A853',
+                        }
+                    },
+                    borderRadius: {
+                        'card': '16px',
+                        'btn': '12px',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Custom scrollbar style to match dark Figma look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Device view frame styles */
+        .device-screen {
+            width: 390px;
+            height: 844px;
+            border-radius: 48px;
+            box-shadow: 0 0 0 12px #1e1e1e, 0 20px 50px rgba(0,0,0,0.8);
+            position: relative;
+            overflow: hidden;
+            background-color: #FFFFFF;
+        }
+        
+        /* Figma alignment guidelines */
+        .figma-grid {
+            background-size: 20px 20px;
+            background-image: linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+        }
+        
+        /* Smart animate animation transition frames */
+        .screen-container {
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+        }
+        
+        /* Floating illustration animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-8px) scale(1.02); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(0.95); opacity: 0.5; }
+        }
+        .pulse-accent {
+            animation: pulse-ring 2.5s infinite;
+        }
+    </style>
+</head>
+<body class="bg-[#1e1e1e] text-gray-300 h-screen flex flex-col overflow-hidden select-none">
+
+    <!-- FIGMA HEADER BAR -->
+    <header class="h-12 bg-[#2c2c2c] border-b border-[#3c3c3c] flex items-center justify-between px-4 z-50 shrink-0">
+        <!-- Left Brand & Tools -->
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 text-white font-semibold">
+                <i class="fa-brands fa-figma text-orange-500 text-lg"></i>
+                <span class="text-sm">YouTube DPDP Consent Flow</span>
+                <span class="bg-[#3c3c3c] text-xs text-gray-400 font-normal px-2 py-0.5 rounded">v1.2 Draft</span>
+            </div>
+            <div class="h-4 w-[1px] bg-[#3c3c3c]"></div>
+            <!-- Tool Icons -->
+            <div class="flex items-center space-x-1">
+                <button class="p-1.5 hover:bg-[#3c3c3c] rounded text-blue-400" title="Move Tool"><i class="fa-solid fa-arrow-pointer"></i></button>
+                <button class="p-1.5 hover:bg-[#3c3c3c] text-gray-400 rounded" title="Region Frame"><i class="fa-solid fa-crop-simple"></i></button>
+                <button class="p-1.5 hover:bg-[#3c3c3c] text-gray-400 rounded" title="Shape Tools"><i class="fa-regular fa-square"></i></button>
+                <button class="p-1.5 hover:bg-[#3c3c3c] text-gray-400 rounded" title="Pen Tool"><i class="fa-solid fa-pen-nib"></i></button>
+                <button class="p-1.5 hover:bg-[#3c3c3c] text-gray-400 rounded" title="Text Tool"><i class="fa-solid fa-t"></i></button>
+                <button class="p-1.5 hover:bg-[#3c3c3c] text-gray-400 rounded" title="Resources / Widgets"><i class="fa-solid fa-cubes"></i></button>
+                <button class="p-1.5 hover:bg-[#3c3c3c] text-gray-400 rounded" title="Hand Tool"><i class="fa-regular fa-hand"></i></button>
+            </div>
+        </div>
+
+        <!-- Center Active Screen State Indicator -->
+        <div class="hidden md:flex items-center space-x-2 bg-[#1e1e1e] border border-[#3c3c3c] rounded-full px-4 py-1 text-xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-gray-400 font-mono">Prototype State: </span>
+            <span id="active-screen-label" class="text-white font-medium">Screen 1 — Privacy Welcome</span>
+        </div>
+
+        <!-- Right Quick Actions -->
+        <div class="flex items-center space-x-3">
+            <button onclick="resetPrototype()" class="px-3 py-1 bg-[#3c3c3c] hover:bg-[#4c4c4c] text-white text-xs font-semibold rounded-md transition flex items-center space-x-1.5">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Restart Prototype</span>
+            </button>
+            <div class="h-4 w-[1px] bg-[#3c3c3c]"></div>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-md transition">Share Prototype</button>
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-yellow-500 flex items-center justify-center text-xs text-white font-bold" title="You (Lead PM Designer)">
+                PM
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN WORKSPACE CONTAINER -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- LEFT SIDEBAR: Layers and Component Hierarchy -->
+        <aside class="w-72 bg-[#2c2c2c] border-r border-[#3c3c3c] flex flex-col justify-between shrink-0">
+            <!-- Layers Tab -->
+            <div class="flex-1 overflow-y-auto">
+                <div class="flex items-center justify-between px-4 py-2 border-b border-[#3c3c3c] text-xs font-semibold text-gray-400 tracking-wider">
+                    <span>LAYERS</span>
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                
+                <!-- Screen Node Groups Tree -->
+                <div class="p-2 space-y-1 text-xs font-mono">
+                    
+                    <!-- Screen 1 Group -->
+                    <div id="layer-screen-1" onclick="navigateToScreen(1)" class="layer-node p-2 rounded cursor-pointer transition flex items-center justify-between bg-blue-900/40 text-blue-300 border border-blue-700/50">
+                        <span class="flex items-center space-x-2">
+                            <i class="fa-solid fa-mobile-screen"></i>
+                            <span class="font-semibold text-[11px]">1. Privacy Welcome</span>
+                        </span>
+                        <i class="fa-solid fa-eye text-[10px]"></i>
+                    </div>
+                    <div id="layer-children-1" class="pl-4 py-1 space-y-1 text-[11px] text-gray-500 border-l border-[#3c3c3c] ml-3">
+                        <div class="hover:text-white cursor-pointer py-0.5 flex items-center space-x-1" onclick="inspectComponent('Illustration Component')">
+                            <i class="fa-regular fa-image"></i> <span>#Illustration Shield</span>
+                        </div>
+                        <div class="hover:text-white cursor-pointer py-0.5 flex items-center space-x-1" onclick="inspectComponent('Benefits Card')">
+                            <i class="fa-solid fa-id-card"></i> <span>#Benefits Card</span>
+                        </div>
+                        <div class="hover:text-white cursor-pointer py-0.5 flex items-center space-x-1" onclick="inspectComponent('Primary Button')">
+                            <i class="fa-solid fa-square-poll-horizontal"></i> <span>#Primary Button</span>
+                        </div>
+                    </div>
+
+                    <!-- Screen 2 Group -->
+                    <div id="layer-screen-2" onclick="navigateToScreen(2)" class="layer-node p-2 rounded cursor-pointer transition flex items-center justify-between hover:bg-[#3c3c3c] text-gray-400">
+                        <span class="flex items-center space-x-2">
+                            <i class="fa-solid fa-mobile-screen"></i>
+                            <span class="font-semibold text-[11px]">2. Choose Preferences</span>
+                        </span>
+                        <i class="fa-regular fa-eye-slash text-[10px] opacity-50"></i>
+                    </div>
+                    <div id="layer-children-2" class="hidden pl-4 py-1 space-y-1 text-[11px] text-gray-500 border-l border-[#3c3c3c] ml-3">
+                        <div class="hover:text-white cursor-pointer py-0.5 flex items-center space-x-1" onclick="inspectComponent('Permission Card')">
+                            <i class="fa-solid fa-table-list"></i> <span>#Permission Cards (4)</span>
+                        </div>
+                        <div class="hover:text-white cursor-pointer py-0.5 flex items-center space-x-1" onclick="inspectComponent('Toggle Switch')">
+                            <i class="fa-solid fa-toggle-on"></i> <span>#Toggle Switch Component</span>
+                        </div>
+                    </div>
+
+                    <!-- Screen 3 Group -->
+                    <div id="layer-screen-3" onclick="navigateToScreen(3)" class="layer-node p-2 rounded cursor-pointer transition flex items-center justify-between hover:bg-[#3c3c3c] text-gray-400">
+                        <span class="flex items-center space-x-2">
+                            <i class="fa-solid fa-mobile-screen"></i>
+                            <span class="font-semibold text-[11px]">3. Privacy Dashboard</span>
+                        </span>
+                        <i class="fa-regular fa-eye-slash text-[10px] opacity-50"></i>
+                    </div>
+                    <div id="layer-children-3" class="hidden pl-4 py-1 space-y-1 text-[11px] text-gray-500 border-l border-[#3c3c3c] ml-3">
+                        <div class="hover:text-white cursor-pointer py-0.5 flex items-center space-x-1" onclick="inspectComponent('Privacy Score Widget')">
+                            <i class="fa-solid fa-gauge"></i> <span>#Privacy Score Widget</span>
+                        </div>
+                        <div class="hover:text-white cursor-pointer py-0.5 flex items-center space-x-1" onclick="inspectComponent('Action Menu Card')">
+                            <i class="fa-solid fa-bars"></i> <span>#Dashboard Menu Cards</span>
+                        </div>
+                    </div>
+
+                    <!-- Screen 4 Group -->
+                    <div id="layer-screen-4" onclick="navigateToScreen(4)" class="layer-node p-2 rounded cursor-pointer transition flex items-center justify-between hover:bg-[#3c3c3c] text-gray-400">
+                        <span class="flex items-center space-x-2">
+                            <i class="fa-solid fa-mobile-screen"></i>
+                            <span class="font-semibold text-[11px]">4. Success State</span>
+                        </span>
+                        <i class="fa-regular fa-eye-slash text-[10px] opacity-50"></i>
+                    </div>
+                    <div id="layer-children-4" class="hidden pl-4 py-1 space-y-1 text-[11px] text-gray-500 border-l border-[#3c3c3c] ml-3">
+                        <div class="hover:text-white cursor-pointer py-0.5 flex items-center space-x-1" onclick="inspectComponent('Success Banner')">
+                            <i class="fa-regular fa-circle-check"></i> <span>#Checkmark Animation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shared Design System Components section -->
+                <div class="mt-6 border-t border-[#3c3c3c] pt-4">
+                    <div class="px-4 py-2 text-xs font-semibold text-gray-400 tracking-wider flex items-center justify-between">
+                        <span>DESIGN SYSTEM</span>
+                        <i class="fa-solid fa-palette text-orange-400"></i>
+                    </div>
+                    <div class="px-4 py-2 space-y-2">
+                        <!-- Token Badges -->
+                        <div class="flex flex-wrap gap-1">
+                            <span onclick="inspectComponent('Primary Color Token')" class="cursor-pointer bg-red-950/50 hover:bg-red-900/60 border border-red-500/30 text-red-400 font-mono text-[9px] px-1.5 py-0.5 rounded">YT_RED: #FF0000</span>
+                            <span onclick="inspectComponent('Success Color Token')" class="cursor-pointer bg-green-950/50 hover:bg-green-900/60 border border-green-500/30 text-green-400 font-mono text-[9px] px-1.5 py-0.5 rounded">SUCCESS: #34A853</span>
+                            <span onclick="inspectComponent('Card Corner Radius')" class="cursor-pointer bg-[#3c3c3c] hover:bg-[#4c4c4c] text-gray-300 font-mono text-[9px] px-1.5 py-0.5 rounded">RADIUS: 16px</span>
+                            <span onclick="inspectComponent('Button Corner Radius')" class="cursor-pointer bg-[#3c3c3c] hover:bg-[#4c4c4c] text-gray-300 font-mono text-[9px] px-1.5 py-0.5 rounded">RADIUS: 12px</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMPONENT INSPECTOR BOX (Active Feedback Panel) -->
+            <div class="p-4 bg-[#212121] border-t border-[#3c3c3c]">
+                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Component Inspector</div>
+                <div id="inspector-content">
+                    <p class="text-xs text-gray-400 leading-relaxed italic">Click on any layer or design system token to inspect its specific properties, spacing guidelines, and code tokens.</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CENTER CANVAS: Figma Interactive Screen Simulation -->
+        <main class="flex-1 figma-grid relative overflow-auto flex items-center justify-center p-8">
+            
+            <!-- Quick Floating Helper Legend -->
+            <div class="absolute top-4 left-4 bg-[#2c2c2c]/90 backdrop-blur-md border border-[#444] p-3 rounded-lg z-10 text-xs shadow-lg max-w-xs">
+                <h4 class="font-bold text-white mb-1"><i class="fa-solid fa-gamepad text-emerald-400 mr-1.5"></i> Interactive Happy Path</h4>
+                <p class="text-gray-400 mb-2 leading-snug">Click buttons and toggle settings inside the phone simulation to test the user flow.</p>
+                <div class="flex items-center space-x-2 text-[10px]">
+                    <span class="px-1.5 py-0.5 bg-neutral-700 rounded text-neutral-300 font-semibold">1</span>
+                    <span>Welcome</span>
+                    <i class="fa-solid fa-chevron-right text-[8px] text-neutral-500"></i>
+                    <span class="px-1.5 py-0.5 bg-neutral-700 rounded text-neutral-300 font-semibold">2</span>
+                    <span>Configure</span>
+                    <i class="fa-solid fa-chevron-right text-[8px] text-neutral-500"></i>
+                    <span class="px-1.5 py-0.5 bg-neutral-700 rounded text-neutral-300 font-semibold">3</span>
+                    <span>Score Dashboard</span>
+                </div>
+            </div>
+
+            <!-- FIGMA APP DEVICE WRAPPER (iPhone 16 Shape) -->
+            <div class="device-screen flex flex-col justify-between select-none">
+                
+                <!-- iOS Top Notch Bar / Dynamic Island -->
+                <div class="absolute top-0 left-0 w-full h-11 bg-transparent flex justify-between items-center px-8 z-30 pointer-events-none">
+                    <!-- Clock -->
+                    <span class="text-[14px] font-bold text-black font-sans leading-none mt-1">9:41</span>
+                    <!-- Dynamic Island Cutout -->
+                    <div class="w-28 h-7 bg-black rounded-full mx-auto relative -top-0.5 flex items-center justify-end pr-3">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                    </div>
+                    <!-- Status Icons -->
+                    <div class="flex items-center space-x-1.5 text-black text-[11px]">
+                        <i class="fa-solid fa-signal"></i>
+                        <i class="fa-solid fa-wifi"></i>
+                        <div class="w-5 h-2.5 border border-black rounded-sm p-0.5 flex items-center">
+                            <div class="h-full w-3.5 bg-black rounded-2xs"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACTIVE APP SCREENS CONTAINER (Overflow Hidden to animate within device body) -->
+                <div class="w-full h-full relative pt-11 pb-8 flex flex-col overflow-hidden">
+                    
+                    <!-- SCREEN 1: Privacy Welcome -->
+                    <div id="app-screen-1" class="screen-container absolute inset-x-0 bottom-8 top-11 px-6 flex flex-col justify-between opacity-100 transform translate-x-0 z-10 bg-white">
+                        <div class="flex-1 flex flex-col justify-center items-center text-center space-y-6">
+                            <!-- Premium Animation Illustration -->
+                            <div class="relative flex items-center justify-center animate-float mt-4">
+                                <div class="absolute w-32 h-32 bg-red-100 rounded-full scale-110 opacity-70 pulse-accent"></div>
+                                <div class="w-24 h-24 bg-red-50 rounded-full border border-red-200 shadow-inner flex items-center justify-center relative z-10">
+                                    <i class="fa-solid fa-shield-halved text-yt-red text-4xl"></i>
+                                    <div class="absolute -bottom-1 -right-1 w-9 h-9 bg-yt-red rounded-full flex items-center justify-center border-2 border-white shadow">
+                                        <i class="fa-solid fa-play text-white text-[11px] ml-0.5"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Screen Header -->
+                            <div class="space-y-2">
+                                <h2 class="text-2xl font-black text-yt-dark tracking-tight font-sans">Privacy, your way</h2>
+                                <p class="text-xs text-gray-500 px-2 leading-relaxed">
+                                    We're updating how we manage your personal data to comply with India's <strong>Digital Personal Data Protection (DPDP) Act 2023</strong>.
+                                </p>
+                            </div>
+
+                            <!-- Checklist Benefits Card -->
+                            <div class="w-full bg-[#F8F9FA] rounded-card border border-[#EBEBEB] p-4 text-left space-y-3">
+                                <div class="flex items-start space-x-3">
+                                    <div class="bg-emerald-100 text-yt-green p-1 rounded-full text-xs shrink-0 mt-0.5">
+                                        <i class="fa-solid fa-check w-4 h-4 flex items-center justify-center"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-yt-dark">Clear Explanations</h4>
+                                        <p class="text-[11px] text-gray-500 leading-normal">Learn exactly what data is used and why in plain English.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <div class="bg-emerald-100 text-yt-green p-1 rounded-full text-xs shrink-0 mt-0.5">
+                                        <i class="fa-solid fa-check w-4 h-4 flex items-center justify-center"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-yt-dark">Easy Controls</h4>
+                                        <p class="text-[11px] text-gray-500 leading-normal">Toggle consent details easily from your customized dashboard.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <div class="bg-emerald-100 text-yt-green p-1 rounded-full text-xs shrink-0 mt-0.5">
+                                        <i class="fa-solid fa-check w-4 h-4 flex items-center justify-center"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-yt-dark">Delete Anytime</h4>
+                                        <p class="text-[11px] text-gray-500 leading-normal">Request complete erasure of your stored history directly inside settings.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons Group -->
+                        <div class="space-y-2 mt-4 pb-4">
+                            <button onclick="navigateToScreen(2)" class="w-full h-12 bg-yt-red hover:bg-[#E60000] text-white font-bold rounded-btn transition shadow-md active:scale-95 text-sm flex items-center justify-center space-x-1.5">
+                                <span>Continue</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </button>
+                            <button onclick="openModal('learn-more-modal')" class="w-full h-10 bg-transparent hover:bg-gray-50 text-gray-500 hover:text-yt-dark text-xs font-semibold rounded-btn transition">
+                                Learn More Details
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <!-- SCREEN 2: Choose Your Preferences -->
+                    <div id="app-screen-2" class="screen-container absolute inset-x-0 bottom-8 top-11 px-5 flex flex-col justify-between opacity-0 transform translate-x-full z-0 bg-white pointer-events-none">
+                        
+                        <!-- Header with Back navigation button -->
+                        <div class="flex items-center space-x-2 pt-2 pb-1">
+                            <button onclick="navigateToScreen(1)" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-700 transition">
+                                <i class="fa-solid fa-arrow-left text-sm"></i>
+                            </button>
+                            <h3 class="text-base font-black text-yt-dark tracking-tight">Choose data usage</h3>
+                        </div>
+
+                        <!-- Permissions Scroll Container -->
+                        <div class="flex-1 overflow-y-auto pr-1 space-y-3 py-2">
+                            <p class="text-[11px] text-gray-500 leading-normal px-1">
+                                Customize your digital profile. Disabling trackers will protect your privacy, though it may change recommendation quality.
+                            </p>
+
+                            <!-- PERMISSION CARDS -->
+                            <!-- Location -->
+                            <div class="p-3 bg-[#F8F9FA] rounded-card border border-[#EBEBEB] flex items-center justify-between hover:border-gray-300 transition">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-9 h-9 bg-blue-50 text-yt-blue rounded-xl flex items-center justify-center shrink-0">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-yt-dark flex items-center space-x-1">
+                                            <span>📍 Location Settings</span>
+                                        </h4>
+                                        <p class="text-[10px] text-gray-500 leading-tight">Used to suggest local creators</p>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="toggle-location" checked onchange="handleToggleChange()" class="sr-only peer">
+                                    <div class="w-10 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yt-green"></div>
+                                </label>
+                            </div>
+
+                            <!-- Watch History -->
+                            <div class="p-3 bg-[#F8F9FA] rounded-card border border-[#EBEBEB] flex items-center justify-between hover:border-gray-300 transition">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-9 h-9 bg-red-50 text-yt-red rounded-xl flex items-center justify-center shrink-0">
+                                        <i class="fa-solid fa-clock-rotate-left"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-yt-dark">🎥 Watch History</h4>
+                                        <p class="text-[10px] text-gray-500 leading-tight">Improve personalized search</p>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="toggle-history" checked onchange="handleToggleChange()" class="sr-only peer">
+                                    <div class="w-10 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yt-green"></div>
+                                </label>
+                            </div>
+
+                            <!-- Personalized Ads -->
+                            <div class="p-3 bg-[#F8F9FA] rounded-card border border-[#EBEBEB] flex items-center justify-between hover:border-gray-300 transition">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-9 h-9 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center shrink-0">
+                                        <i class="fa-solid fa-rectangle-ad"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-yt-dark">📢 Personalized Ads</h4>
+                                        <p class="text-[10px] text-gray-500 leading-tight">Receive relevant advertisements</p>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="toggle-ads" onchange="handleToggleChange()" class="sr-only peer">
+                                    <div class="w-10 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yt-green"></div>
+                                </label>
+                            </div>
+
+                            <!-- Analytics -->
+                            <div class="p-3 bg-[#F8F9FA] rounded-card border border-[#EBEBEB] flex items-center justify-between hover:border-gray-300 transition">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-9 h-9 bg-emerald-50 text-yt-green rounded-xl flex items-center justify-center shrink-0">
+                                        <i class="fa-solid fa-chart-line"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-yt-dark">📈 Analytics Usage</h4>
+                                        <p class="text-[10px] text-gray-500 leading-tight">Help improve app performance</p>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="toggle-analytics" checked onchange="handleToggleChange()" class="sr-only peer">
+                                    <div class="w-10 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yt-green"></div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Fixed Bottom Save Button -->
+                        <div class="py-4 bg-white border-t border-[#F1F1F1]">
+                            <button onclick="navigateToScreen(3)" class="w-full h-12 bg-yt-dark hover:bg-black text-white font-bold rounded-btn transition shadow active:scale-95 text-sm flex items-center justify-center space-x-1.5">
+                                <i class="fa-solid fa-floppy-disk text-xs"></i>
+                                <span>Save Preferences</span>
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <!-- SCREEN 3: Privacy Dashboard -->
+                    <div id="app-screen-3" class="screen-container absolute inset-x-0 bottom-8 top-11 px-5 flex flex-col justify-between opacity-0 transform translate-x-full z-0 bg-white pointer-events-none">
+                        
+                        <!-- Mini App Navbar -->
+                        <div class="flex items-center justify-between pt-2 pb-1">
+                            <h3 class="text-base font-black text-yt-dark tracking-tight">Privacy Dashboard</h3>
+                            <!-- Mini Avatar Badge -->
+                            <div class="flex items-center space-x-1.5 bg-[#F8F9FA] px-2 py-1 rounded-full border border-[#EBEBEB]">
+                                <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                                <span class="text-[10px] font-bold text-gray-700">Rahul (22)</span>
+                            </div>
+                        </div>
+
+                        <!-- Scrollable Controls -->
+                        <div class="flex-1 overflow-y-auto pr-1 space-y-4 py-2">
+                            
+                            <!-- INTERVIEWER SPOTLIGHT: DYNAMIC PRIVACY SCORE CARD -->
+                            <div class="bg-gradient-to-br from-yt-dark to-neutral-800 rounded-card p-4 text-white shadow-md relative overflow-hidden">
+                                <div class="absolute -right-6 -bottom-6 opacity-10 text-9xl text-white">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                </div>
+                                
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <span class="text-[9px] uppercase tracking-wider text-gray-400 font-bold">Your Privacy Score</span>
+                                        <div class="flex items-baseline space-x-1">
+                                            <span id="score-val" class="text-3xl font-black text-white">82</span>
+                                            <span class="text-xs text-gray-400">/ 100</span>
+                                        </div>
+                                    </div>
+                                    <div id="score-badge" class="px-2 py-0.5 bg-yt-green text-[9px] font-bold rounded-full uppercase tracking-wider text-white">
+                                        Excellent
+                                    </div>
+                                </div>
+
+                                <!-- Dynamic Stars -->
+                                <div id="score-stars" class="flex text-amber-400 text-xs my-2">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-regular fa-star"></i>
+                                </div>
+
+                                <!-- Dynamic Suggestions Widget -->
+                                <div class="mt-3 bg-white/5 rounded-lg p-2.5 border border-white/10">
+                                    <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-wide block mb-1">Score Recommendations</span>
+                                    <div id="suggestion-box" class="text-[10px] text-gray-300 leading-relaxed space-y-1">
+                                        <!-- Suggestions will populate via JS dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- MENU SYSTEM CARDS -->
+                            <div class="space-y-2">
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-1">Consent Actions</span>
+                                
+                                <div onclick="triggerAction('download')" class="p-3 bg-[#F8F9FA] hover:bg-gray-100 rounded-card border border-[#EBEBEB] flex items-center justify-between cursor-pointer transition">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa-solid fa-download text-yt-blue text-sm w-4 text-center"></i>
+                                        <span class="text-xs font-bold text-yt-dark">Download My Data</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                                </div>
+
+                                <div onclick="triggerAction('delete')" class="p-3 bg-[#F8F9FA] hover:bg-gray-100 rounded-card border border-[#EBEBEB] flex items-center justify-between cursor-pointer transition">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa-solid fa-trash-can text-yt-red text-sm w-4 text-center"></i>
+                                        <span class="text-xs font-bold text-yt-dark">Delete My Data</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                                </div>
+
+                                <div onclick="navigateToScreen(2)" class="p-3 bg-[#F8F9FA] hover:bg-gray-100 rounded-card border border-[#EBEBEB] flex items-center justify-between cursor-pointer transition">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa-solid fa-sliders text-yt-green text-sm w-4 text-center"></i>
+                                        <span class="text-xs font-bold text-yt-dark">Manage Consent Controls</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                                </div>
+
+                                <div onclick="openModal('privacy-policy-modal')" class="p-3 bg-[#F8F9FA] hover:bg-gray-100 rounded-card border border-[#EBEBEB] flex items-center justify-between cursor-pointer transition">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa-solid fa-file-contract text-gray-500 text-sm w-4 text-center"></i>
+                                        <span class="text-xs font-bold text-yt-dark">View DPDP Privacy Policy</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fixed Footer Bottom area -->
+                        <div class="py-4 bg-white border-t border-[#F1F1F1] flex items-center justify-between text-[11px] text-gray-400">
+                            <span>Last Updated: <strong class="text-gray-600">Today</strong></span>
+                            <button onclick="navigateToScreen(4)" class="px-4 py-2 bg-yt-green hover:bg-green-700 text-white font-bold rounded-lg transition active:scale-95 flex items-center space-x-1">
+                                <span>Save & Finish</span>
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <!-- SCREEN 4: Success Onboarding State -->
+                    <div id="app-screen-4" class="screen-container absolute inset-x-0 bottom-8 top-11 px-6 flex flex-col justify-between opacity-0 transform translate-x-full z-0 bg-white pointer-events-none">
+                        
+                        <div class="flex-1 flex flex-col justify-center items-center text-center space-y-6">
+                            <!-- Success Checkmark with floating ripple rings -->
+                            <div class="relative flex items-center justify-center my-6">
+                                <div class="absolute w-24 h-24 bg-emerald-100 rounded-full scale-125 opacity-60 animate-ping" style="animation-duration: 3s;"></div>
+                                <div class="w-20 h-20 bg-yt-green rounded-full flex items-center justify-center relative z-10 shadow-lg shadow-emerald-200">
+                                    <i class="fa-solid fa-circle-check text-white text-4xl"></i>
+                                </div>
+                            </div>
+
+                            <!-- Headline content -->
+                            <div class="space-y-2">
+                                <h2 class="text-2xl font-black text-yt-dark tracking-tight">You're in control.</h2>
+                                <p class="text-xs text-gray-500 leading-relaxed px-4">
+                                    Your personal data preferences have been successfully updated in accordance with <strong>India's DPDP Act 2023</strong>.
+                                </p>
+                            </div>
+
+                            <!-- Active Summary Card -->
+                            <div class="w-full bg-[#F8F9FA] rounded-card border border-[#EBEBEB] p-4 text-left space-y-2 text-xs">
+                                <div class="flex justify-between border-b border-gray-200 pb-2">
+                                    <span class="text-gray-500">Device Status</span>
+                                    <span class="font-bold text-yt-green">Protected</span>
+                                </div>
+                                <div class="flex justify-between text-[11px]">
+                                    <span class="text-gray-500">Location tracking</span>
+                                    <span id="summary-location" class="font-semibold text-yt-dark">OFF</span>
+                                </div>
+                                <div class="flex justify-between text-[11px]">
+                                    <span class="text-gray-500">Watch history sync</span>
+                                    <span id="summary-history" class="font-semibold text-yt-dark">OFF</span>
+                                </div>
+                                <div class="flex justify-between text-[11px]">
+                                    <span class="text-gray-500">Personalized marketing</span>
+                                    <span id="summary-ads" class="font-semibold text-yt-dark">OFF</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Complete Action buttons -->
+                        <div class="space-y-2 mt-4 pb-4">
+                            <button onclick="resetPrototype()" class="w-full h-12 bg-yt-red hover:bg-[#E60000] text-white font-bold rounded-btn transition shadow-md active:scale-95 text-sm flex items-center justify-center space-x-1.5">
+                                <i class="fa-solid fa-play text-xs"></i>
+                                <span>Go to YouTube app</span>
+                            </button>
+                            <button onclick="navigateToScreen(2)" class="w-full h-10 bg-transparent hover:bg-gray-50 text-gray-500 hover:text-yt-dark text-xs font-semibold rounded-btn transition">
+                                Manage Preferences Again
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <!-- STATIC DYNAMIC BACKGROUND OVERLAYS FOR DEMO (Modals & Toasts inside Mockup) -->
+                    <!-- Download Data Modal simulator -->
+                    <div id="demo-download-modal" class="hidden absolute inset-0 bg-black/60 z-40 flex items-end justify-center">
+                        <div class="w-full bg-white rounded-t-[32px] p-6 space-y-4 shadow-2xl transition-transform translate-y-0">
+                            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                                <h4 class="text-sm font-bold text-yt-dark">📥 Download Data Archive</h4>
+                                <button onclick="closeDemoModal('download')" class="text-gray-400 hover:text-yt-dark"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div id="download-prompt-body" class="space-y-3">
+                                <p class="text-xs text-gray-500 leading-normal">
+                                    Under DPDP Article 11, you have the right to request a structural export of your historical profiles.
+                                </p>
+                                <button onclick="simulateDataExport()" class="w-full py-3 bg-yt-blue text-white font-bold text-xs rounded-btn shadow hover:bg-blue-600 transition flex items-center justify-center space-x-2">
+                                    <i class="fa-solid fa-file-export"></i>
+                                    <span>Request ZIP Archive</span>
+                                </button>
+                            </div>
+                            <div id="download-loading" class="hidden flex flex-col items-center justify-center py-6 space-y-3">
+                                <div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                <span class="text-xs font-semibold text-yt-dark">Structuring secure data packages...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delete Data Modal simulator -->
+                    <div id="demo-delete-modal" class="hidden absolute inset-0 bg-black/60 z-40 flex items-end justify-center">
+                        <div class="w-full bg-white rounded-t-[32px] p-6 space-y-4 shadow-2xl">
+                            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                                <h4 class="text-sm font-bold text-yt-dark text-yt-red">🗑 Erasure Request</h4>
+                                <button onclick="closeDemoModal('delete')" class="text-gray-400 hover:text-yt-dark"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <p class="text-xs text-gray-500 leading-normal">
+                                Are you sure you want to completely erase your Google/YouTube search history metrics from local nodes? This action is irreversible.
+                            </p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="closeDemoModal('delete')" class="py-2.5 bg-gray-100 text-gray-600 text-xs font-bold rounded-btn hover:bg-gray-200">Cancel</button>
+                                <button onclick="simulateDataErasure()" class="py-2.5 bg-yt-red text-white text-xs font-bold rounded-btn hover:bg-red-700">Yes, Erase</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CUSTOM FLOATING IN-APP TOAST ALERT SYSTEM (Replaces bad Alert Boxes) -->
+                    <div id="app-toast-alert" class="absolute top-14 left-4 right-4 bg-gray-900 text-white rounded-xl py-3 px-4 shadow-lg flex items-center space-x-3 transform -translate-y-24 transition-transform duration-300 z-50 pointer-events-none opacity-0">
+                        <i id="toast-icon" class="fa-solid fa-circle-info text-yt-green"></i>
+                        <span id="toast-message" class="text-xs font-medium">Testing Alerts</span>
+                    </div>
+
+                </div>
+
+                <!-- iOS Bottom Home Control Bar -->
+                <div class="absolute bottom-1 w-full h-5 flex justify-center items-center pointer-events-none">
+                    <div class="w-32 h-1 bg-gray-300 rounded-full"></div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- RIGHT SIDEBAR: Prototype Interactions & Testing Playground -->
+        <aside class="w-80 bg-[#2c2c2c] border-l border-[#3c3c3c] flex flex-col justify-between overflow-y-auto shrink-0 p-4 space-y-6">
+            
+            <!-- Design & Prototype Tabs -->
+            <div>
+                <div class="flex border-b border-[#3c3c3c] mb-4 text-xs font-bold text-gray-400">
+                    <button class="flex-1 pb-2 border-b-2 border-transparent hover:text-white transition uppercase text-center">Design</button>
+                    <button class="flex-1 pb-2 border-b-2 border-blue-500 text-white transition uppercase text-center">Prototype</button>
+                </div>
+
+                <!-- Figma Connection Details -->
+                <div class="space-y-4">
+                    <div class="bg-[#1e1e1e] rounded-lg p-3 space-y-2 border border-[#3c3c3c]">
+                        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Animation settings</span>
+                        <div class="flex items-center justify-between text-xs font-mono text-gray-300">
+                            <span>Type</span>
+                            <span class="text-blue-400 font-semibold">Smart Animate</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs font-mono text-gray-300">
+                            <span>Duration</span>
+                            <span class="text-white">300ms</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs font-mono text-gray-300">
+                            <span>Timing</span>
+                            <span class="text-white">Ease In Out</span>
+                        </div>
+                    </div>
+
+                    <!-- Flow Diagram Steps -->
+                    <div class="space-y-2">
+                        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block pl-1">Interactive Connections</span>
+                        <div class="space-y-1.5 font-mono text-[11px]">
+                            <div class="flex items-center justify-between p-2 rounded bg-[#3c3c3c]/50 text-gray-300">
+                                <span>Button: Continue</span>
+                                <i class="fa-solid fa-arrow-right text-[10px] text-blue-400 mx-2"></i>
+                                <span class="text-white">Preferences</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded bg-[#3c3c3c]/50 text-gray-300">
+                                <span>Button: Save</span>
+                                <i class="fa-solid fa-arrow-right text-[10px] text-blue-400 mx-2"></i>
+                                <span class="text-white">Dashboard</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded bg-[#3c3c3c]/50 text-gray-300">
+                                <span>Button: Save & Finish</span>
+                                <i class="fa-solid fa-arrow-right text-[10px] text-blue-400 mx-2"></i>
+                                <span class="text-white">Success Onboarding</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXTREMELY PM-VALUABLE: TESTING CHECKLIST FOR REVIEWS -->
+            <div class="bg-[#1e1e1e] border border-[#3c3c3c] rounded-xl p-4 space-y-3">
+                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest flex items-center space-x-1">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Onboarding Review</span>
+                </span>
+                <p class="text-[11px] text-gray-400 leading-relaxed">
+                    Check if all constraints of the Digital Personal Data Protection Act 2023 are fully met inside this simulator module.
+                </p>
+                <div class="space-y-2 text-xs">
+                    <div class="flex items-start space-x-2.5">
+                        <input type="checkbox" id="chk-dpdp-1" checked disabled class="accent-emerald-500 rounded mt-0.5">
+                        <label class="text-gray-300 text-[11px] leading-tight"><strong>Informed Consent:</strong> Real explanations for granular options.</label>
+                    </div>
+                    <div class="flex items-start space-x-2.5">
+                        <input type="checkbox" id="chk-dpdp-2" checked disabled class="accent-emerald-500 rounded mt-0.5">
+                        <label class="text-gray-300 text-[11px] leading-tight"><strong>Right of Erasure:</strong> Implemented direct history purge actions.</label>
+                    </div>
+                    <div class="flex items-start space-x-2.5">
+                        <input type="checkbox" id="chk-dpdp-3" checked disabled class="accent-emerald-500 rounded mt-0.5">
+                        <label class="text-gray-300 text-[11px] leading-tight"><strong>Dynamic Metrics Score:</strong> Active scores encourage configuration updates.</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Educational Footer Info -->
+            <div class="text-[10px] text-gray-500 leading-normal border-t border-[#3c3c3c] pt-3">
+                Built strictly according to SF Pro Display/Inter typography & Material Design Tokens. Meets Article 6, 8, & 11 standards of Indian Data Protection compliance.
+            </div>
+        </aside>
+
+    </div>
+
+
+    <!-- ============================================================================== -->
+    <!-- GLOBAL ACCESSIBLE CHEATSHEETS & MODALS (SURROUNDING OUTSIDE THE SIMULATOR) -->
+    
+    <!-- Learn More Modal Sheet (DPDP Act info) -->
+    <div id="learn-more-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-neutral-900 border border-neutral-800 text-white rounded-2xl p-6 max-w-lg w-full space-y-4 shadow-2xl relative">
+            <button onclick="closeModal('learn-more-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition text-lg"><i class="fa-solid fa-xmark"></i></button>
+            <div class="flex items-center space-x-3 border-b border-neutral-800 pb-3">
+                <i class="fa-solid fa-scale-balanced text-yt-red text-2xl"></i>
+                <h3 class="text-lg font-black text-white">DPDP Compliance Overview</h3>
+            </div>
+            <div class="space-y-3 text-xs text-neutral-300 leading-relaxed max-h-96 overflow-y-auto pr-2">
+                <p>
+                    The <strong>Digital Personal Data Protection (DPDP) Act 2023</strong> is India's premium legal framework ensuring user transparency over tracking. This presentation simulator implements three core pillars of the act:
+                </p>
+                <div class="p-3 bg-neutral-950 rounded-lg border border-neutral-800 space-y-2">
+                    <p class="font-bold text-yt-blue">Pillar 1: Granular Opt-Ins</p>
+                    <p class="text-neutral-400 leading-normal">Users must be presented with distinct purpose-specific options. Broad "Accept All" pop-ups are legally compromised and create system mistrust.</p>
+                </div>
+                <div class="p-3 bg-neutral-950 rounded-lg border border-neutral-800 space-y-2">
+                    <p class="font-bold text-yt-green">Pillar 2: Right to Withdraw Consent</p>
+                    <p class="text-neutral-400 leading-normal">Withdrawing consent must be as simple as granting it. The Dynamic Settings screen acts as an instant toggled data revocation manager.</p>
+                </div>
+                <div class="p-3 bg-neutral-950 rounded-lg border border-neutral-800 space-y-2">
+                    <p class="font-bold text-amber-500">Pillar 3: Erasure Rights</p>
+                    <p class="text-neutral-400 leading-normal">Under Section 12, users can initiate data erasure. Once requested, YouTube's pipeline must clear historical search caches within specified parameters.</p>
+                </div>
+            </div>
+            <div class="pt-2">
+                <button onclick="closeModal('learn-more-modal')" class="w-full py-3 bg-yt-red hover:bg-[#E60000] text-white font-bold rounded-btn text-xs transition">Got It, Let's Return</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal Sheet -->
+    <div id="privacy-policy-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-neutral-900 border border-neutral-800 text-white rounded-2xl p-6 max-w-lg w-full space-y-4 shadow-2xl relative">
+            <button onclick="closeModal('privacy-policy-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition text-lg"><i class="fa-solid fa-xmark"></i></button>
+            <div class="flex items-center space-x-3 border-b border-neutral-800 pb-3">
+                <i class="fa-solid fa-file-shield text-yt-blue text-2xl"></i>
+                <h3 class="text-lg font-black text-white">YouTube DPDP Privacy Policy</h3>
+            </div>
+            <div class="space-y-3 text-xs text-neutral-300 leading-relaxed max-h-96 overflow-y-auto pr-2">
+                <p class="font-bold text-gray-400">Notice on Data Collection:</p>
+                <p>We process your data for tailored user experiences, secure authorization protocols, and service stability assessments. We never transfer your details without structural security agreements.</p>
+                <p class="font-bold text-gray-400">How to Exercise Your Rights:</p>
+                <p>You can adjust, retrieve, or completely delete stored history inside your customized dashboard at any time. Our data dispute resolution support can be accessed via: support-dpdp@youtube.co.in</p>
+            </div>
+            <div class="pt-2">
+                <button onclick="closeModal('privacy-policy-modal')" class="w-full py-3 bg-neutral-800 hover:bg-neutral-700 text-white font-bold rounded-btn text-xs transition">Close Policy</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ============================================================================== -->
+    <!-- INTERACTIVE JAVASCRIPT STATE CONTROLLER -->
+    <script>
+        // Core State Machine
+        let currentScreen = 1;
+        
+        // Active permissions dictionary
+        const permissions = {
+            location: true,
+            history: true,
+            ads: false,
+            analytics: true
+        };
+
+        // Complete specs directory for Component Inspector
+        const componentSpecs = {
+            'Illustration Component': {
+                title: '🛡️ Floating Illustration Icon',
+                category: 'Visual Asset',
+                tokens: 'bg-red-50, border-red-200, text-yt-red',
+                sizing: 'Outer: 128px | Inner: 96px',
+                info: 'A floating design composition using interactive pulse rings to symbolize immediate shield protection.'
+            },
+            'Benefits Card': {
+                title: '#Benefits Checklist Card',
+                category: 'Form Block',
+                tokens: 'bg-[#F8F9FA], rounded-[16px], border-[#EBEBEB]',
+                sizing: 'Padding: 16px | Gap: 12px',
+                info: 'Checklist displaying key user benefits clearly. Perfect for bypassing standard legally-heavy agreement jargon.'
+            },
+            'Primary Button': {
+                title: '#Primary Action Button',
+                category: 'Button UI Element',
+                tokens: 'bg-yt-red, font-weight: 700, rounded-[12px]',
+                sizing: 'Height: 48px | Typography: Inter 14px',
+                info: 'Main interactive Call-to-Action conforming strictly to high contrast access requirements.'
+            },
+            'Permission Card': {
+                title: '#Granular Permission Card',
+                category: 'Input Container',
+                tokens: 'bg-[#F8F9FA], border-[#EBEBEB], rounded-[16px]',
+                sizing: 'Padding: 12px | Icon block: 36x36px',
+                info: 'A modular, easy-to-use card block featuring clean emojis, descriptive captions, and a dynamic toggle.'
+            },
+            'Toggle Switch': {
+                title: '#Material 3 Toggle Switch',
+                category: 'Form Control',
+                tokens: 'Checked-bg: #34A853 | Base-bg: #E5E7EB',
+                sizing: 'Width: 40px | Height: 24px | Knob: 20px',
+                info: 'Standard toggle control. Slides smoothly inside container frame elements when toggled.'
+            },
+            'Privacy Score Widget': {
+                title: '🏆 Privacy Metrics Card',
+                category: 'Widget View',
+                tokens: 'bg-gradient-to-br, rounded-[16px], shadow-md',
+                sizing: 'Dynamic height, background padding: 16px',
+                info: 'PM-focused widget. Real-time changes directly prompt updates to both the score and security tips.'
+            },
+            'Action Menu Card': {
+                title: '#Dashboard Menu Link Card',
+                category: 'Interactive link',
+                tokens: 'bg-[#F8F9FA], rounded-[16px], active-scale: 98%',
+                sizing: 'Padding: 12px',
+                info: 'Launches direct modal panels for key legal operations including erasure, archiving, or auditing.'
+            },
+            'Success Banner': {
+                title: '#Success Confirmation Banner',
+                category: 'Static Block',
+                tokens: 'bg-yt-green, shadow-lg, scale-125',
+                sizing: 'Dimensions: 80x80px | SVG check icon: 36px',
+                info: 'Highly rewarding feedback component celebrating direct user configuration updates.'
+            },
+            'Primary Color Token': {
+                title: '🔴 YouTube Red Style Token',
+                category: 'Color Token',
+                tokens: '#FF0000',
+                sizing: 'N/A',
+                info: 'Main accent color used consistently across key interactive paths and warning screens.'
+            },
+            'Success Color Token': {
+                title: '🟢 Success Green Token',
+                category: 'Color Token',
+                tokens: '#34A853',
+                sizing: 'N/A',
+                info: 'Accent color representing compliant environments, high scores, and success confirmation indicators.'
+            },
+            'Card Corner Radius': {
+                title: '⏹️ Card Corner Specification',
+                category: 'Corner Radius',
+                tokens: '16px (0.5rem)',
+                sizing: 'N/A',
+                info: 'Ensures friendly, curved edges aligned with Material Design aesthetic principles.'
+            },
+            'Button Corner Radius': {
+                title: '⏹️ Button Corner Specification',
+                category: 'Corner Radius',
+                tokens: '12px (0.375rem)',
+                sizing: 'N/A',
+                info: 'Slightly sharper corner radius applied on action buttons to focus interactive paths.'
+            }
+        };
+
+        // Transition Screens (Smart Animate Simulation)
+        function navigateToScreen(targetScreenNum) {
+            const currentElement = document.getElementById(`app-screen-${currentScreen}`);
+            const targetElement = document.getElementById(`app-screen-${targetScreenNum}`);
+            const activeLabel = document.getElementById('active-screen-label');
+            
+            // Highlight matching layer sidebar node
+            document.querySelectorAll('.layer-node').forEach(node => {
+                node.classList.remove('bg-blue-900/40', 'text-blue-300', 'border', 'border-blue-700/50');
+                node.classList.add('text-gray-400');
+            });
+            const selectedLayerNode = document.getElementById(`layer-screen-${targetScreenNum}`);
+            if (selectedLayerNode) {
+                selectedLayerNode.classList.add('bg-blue-900/40', 'text-blue-300', 'border', 'border-blue-700/50');
+                selectedLayerNode.classList.remove('text-gray-400');
+            }
+
+            // Expand/collapse children folders in Figma layer list
+            for (let i = 1; i <= 4; i++) {
+                const childFolder = document.getElementById(`layer-children-${i}`);
+                if (i === targetScreenNum) {
+                    childFolder.classList.remove('hidden');
+                } else {
+                    childFolder.classList.add('hidden');
+                }
+            }
+
+            // Set dynamic status name
+            const labels = {
+                1: "Screen 1 — Privacy Welcome",
+                2: "Screen 2 — Choose Your Preferences",
+                3: "Screen 3 — Privacy Dashboard",
+                4: "Screen 4 — Success Onboarding"
+            };
+            activeLabel.textContent = labels[targetScreenNum];
+
+            if (currentScreen === targetScreenNum) return;
+
+            // Perform fade-out of current screen
+            currentElement.classList.add('opacity-0', 'pointer-events-none');
+            
+            if (targetScreenNum > currentScreen) {
+                // Moving forward: Slide left
+                currentElement.classList.add('-translate-x-full');
+                targetElement.classList.remove('translate-x-full');
+                targetElement.classList.add('translate-x-0');
+            } else {
+                // Moving backward: Slide right
+                currentElement.classList.add('translate-x-full');
+                targetElement.classList.remove('-translate-x-full');
+                targetElement.classList.add('translate-x-0');
+            }
+
+            targetElement.classList.remove('opacity-0', 'pointer-events-none');
+            targetElement.classList.add('opacity-100', 'z-10');
+            currentElement.classList.remove('z-10');
+            
+            currentScreen = targetScreenNum;
+
+            // Run updates if navigation lands on specialized state panels
+            if (currentScreen === 3) {
+                updatePrivacyScore();
+            } else if (currentScreen === 4) {
+                updateSuccessSummary();
+            }
+        }
+
+        // Synchronize Switch values with state dictionaries
+        function handleToggleChange() {
+            permissions.location = document.getElementById('toggle-location').checked;
+            permissions.history = document.getElementById('toggle-history').checked;
+            permissions.ads = document.getElementById('toggle-ads').checked;
+            permissions.analytics = document.getElementById('toggle-analytics').checked;
+            
+            // Provide localized user toast alert for feedback
+            showAppToast("Configuration cached. Score modified!", "fa-circle-notch text-blue-500 animate-spin");
+        }
+
+        // Dynamically compute user's privacy index score
+        function updatePrivacyScore() {
+            // Formula metrics: 100 base, subtraction deductions for enabled risky trackers
+            let score = 100;
+            
+            if (permissions.location) score -= 8;
+            if (permissions.history) score -= 4;
+            if (permissions.ads) score -= 15;
+            if (permissions.analytics) score -= 6;
+
+            const scoreText = document.getElementById('score-val');
+            const scoreBadge = document.getElementById('score-badge');
+            const scoreStars = document.getElementById('score-stars');
+            const suggestionBox = document.getElementById('suggestion-box');
+
+            // Set numeric score
+            scoreText.textContent = score;
+
+            // Adjust badge copy & colors based on performance bands
+            let badgeText = "Fair";
+            let badgeColor = "bg-amber-500";
+            let starsHTML = "";
+
+            if (score >= 90) {
+                badgeText = "Excellent";
+                badgeColor = "bg-yt-green";
+                starsHTML = `<i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>`;
+            } else if (score >= 80) {
+                badgeText = "Good";
+                badgeColor = "bg-emerald-500";
+                starsHTML = `<i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-regular fa-star"></i>`;
+            } else if (score >= 70) {
+                badgeText = "Fair";
+                badgeColor = "bg-amber-500";
+                starsHTML = `<i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-regular fa-star"></i>
+                            <i class="fa-regular fa-star"></i>`;
+            } else {
+                badgeText = "Low Safety";
+                badgeColor = "bg-yt-red";
+                starsHTML = `<i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-regular fa-star"></i>
+                            <i class="fa-regular fa-star"></i>
+                            <i class="fa-regular fa-star"></i>`;
+            }
+
+            scoreBadge.textContent = badgeText;
+            scoreBadge.className = `px-2 py-0.5 text-[9px] font-bold rounded-full uppercase tracking-wider text-white ${badgeColor}`;
+            scoreStars.innerHTML = starsHTML;
+
+            // Update custom suggestions checklist
+            let suggestionListHTML = "";
+            let suggestionsFound = 0;
+
+            if (permissions.location) {
+                suggestionListHTML += `<p class="flex items-start"><span class="mr-1">💡</span> Disable location tracking to earn +8 points.</p>`;
+                suggestionsFound++;
+            }
+            if (permissions.ads) {
+                suggestionListHTML += `<p class="flex items-start"><span class="mr-1">💡</span> Opt-out of Personalized ads to earn +15 points.</p>`;
+                suggestionsFound++;
+            }
+            if (permissions.analytics) {
+                suggestionListHTML += `<p class="flex items-start"><span class="mr-1">💡</span> Restrict diagnostics sharing to earn +6 points.</p>`;
+                suggestionsFound++;
+            }
+            if (suggestionsFound === 0) {
+                suggestionListHTML = `<p class="text-emerald-400 font-bold flex items-center"><i class="fa-solid fa-check-circle mr-1"></i> Your profile is completely secured! Perfect score.</p>`;
+            }
+
+            suggestionBox.innerHTML = suggestionListHTML;
+        }
+
+        // Write active toggled settings to Final Success Page card
+        function updateSuccessSummary() {
+            document.getElementById('summary-location').textContent = permissions.location ? "ON" : "OFF";
+            document.getElementById('summary-location').className = permissions.location ? "font-bold text-yt-red" : "font-bold text-yt-green";
+            
+            document.getElementById('summary-history').textContent = permissions.history ? "ON" : "OFF";
+            document.getElementById('summary-history').className = permissions.history ? "font-bold text-yt-red" : "font-bold text-yt-green";
+
+            document.getElementById('summary-ads').textContent = permissions.ads ? "ON" : "OFF";
+            document.getElementById('summary-ads').className = permissions.ads ? "font-bold text-yt-red" : "font-bold text-yt-green";
+        }
+
+        // Display custom property sheets in Left Sidebar panels
+        function inspectComponent(componentName) {
+            const contentBox = document.getElementById('inspector-content');
+            const data = componentSpecs[componentName];
+
+            if (!data) {
+                contentBox.innerHTML = `<p class="text-xs text-gray-400 italic">Select a layer component to view specifications.</p>`;
+                return;
+            }
+
+            contentBox.innerHTML = `
+                <div class="space-y-2 border border-[#444] bg-[#2c2c2c] p-3 rounded-lg text-xs">
+                    <div class="flex items-center justify-between border-b border-[#3c3c3c] pb-1">
+                        <span class="font-bold text-white text-[11px]">${data.title}</span>
+                        <span class="bg-blue-900/40 text-blue-300 px-1 rounded text-[8px] font-mono">${data.category}</span>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] text-gray-500 font-mono">TOKENS:</p>
+                        <p class="text-white font-mono text-[9px] bg-neutral-900 p-1 rounded overflow-x-auto">${data.tokens}</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] text-gray-500 font-mono">SIZING GRID:</p>
+                        <p class="text-gray-300 font-mono text-[10px]">${data.sizing}</p>
+                    </div>
+                    <p class="text-[11px] text-gray-400 leading-normal border-t border-[#3c3c3c] pt-2">${data.info}</p>
+                </div>
+            `;
+        }
+
+        // Execute dynamic mock action flows inside simulator device
+        function triggerAction(actionType) {
+            if (actionType === 'download') {
+                document.getElementById('demo-download-modal').classList.remove('hidden');
+                document.getElementById('download-prompt-body').classList.remove('hidden');
+                document.getElementById('download-loading').classList.add('hidden');
+            } else if (actionType === 'delete') {
+                document.getElementById('demo-delete-modal').classList.remove('hidden');
+            }
+        }
+
+        function closeDemoModal(actionType) {
+            if (actionType === 'download') {
+                document.getElementById('demo-download-modal').classList.add('hidden');
+            } else if (actionType === 'delete') {
+                document.getElementById('demo-delete-modal').classList.add('hidden');
+            }
+        }
+
+        function simulateDataExport() {
+            document.getElementById('download-prompt-body').classList.add('hidden');
+            document.getElementById('download-loading').classList.remove('hidden');
+            
+            // Simulate brief, modern delay for backend export compilation
+            setTimeout(() => {
+                closeDemoModal('download');
+                showAppToast("ZIP Archive generated! (Check downloads folder)", "fa-circle-check text-yt-green");
+            }, 2500);
+        }
+
+        function simulateDataErasure() {
+            closeDemoModal('delete');
+            showAppToast("Request initiated. History files purged!", "fa-trash text-yt-red");
+        }
+
+        // Universal modal sheet toggling helpers
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Display in-app notifications
+        function showAppToast(message, iconClass) {
+            const toast = document.getElementById('app-toast-alert');
+            const msgEl = document.getElementById('toast-message');
+            const iconEl = document.getElementById('toast-icon');
+
+            msgEl.textContent = message;
+            iconEl.className = `fa-solid ${iconClass}`;
+            
+            toast.classList.remove('-translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('-translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+
+        // Restart entire simulator happy path back to Screen 1
+        function resetPrototype() {
+            // Restore default values
+            document.getElementById('toggle-location').checked = true;
+            document.getElementById('toggle-history').checked = true;
+            document.getElementById('toggle-ads').checked = false;
+            document.getElementById('toggle-analytics').checked = true;
+            
+            permissions.location = true;
+            permissions.history = true;
+            permissions.ads = false;
+            permissions.analytics = true;
+
+            navigateToScreen(1);
+            showAppToast("Figma state fully re-compiled", "fa-arrows-rotate text-blue-500");
+        }
+
+        // Initialize setup constraints immediately on window load
+        window.onload = function() {
+            updatePrivacyScore();
+        }
+    </script>
+</body>
+</html>
